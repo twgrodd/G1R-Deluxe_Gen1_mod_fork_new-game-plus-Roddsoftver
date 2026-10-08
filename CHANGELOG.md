@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.8
+
+- Added Dragon Master on Route 23 at (6,32) and Red Echo on Route 23 at (11,20).
+- Both NPCs have locked dialogue and a battle confirmation prompt.
+- Battles share existing NG+ challenge teams, rewards, unlocks, and victory tracking.
+- Companion Trainer Rematch RoddSoft now bypasses all NG+ boss NPC interactions.
+- Requires in-game testing; Red Echo's Route 23 map is inferred from the supplied coordinates.
+
 ## 1.0.6
 
 - Added Blue Prime as a stationary, interactable overworld NPC at Route 22 (X=19, Y=4).
