@@ -584,53 +584,58 @@ local function registerBluePrime(mod)
   registry:override(BLUE_MAP, updated)
 end
 
+local function bossDialogue(mod, game, message, onDone)
+  -- Explicitly wait for player input between pages and at the end.
+  game.stack:push(mod.ui.TextBox.new(game, message, onDone, {
+    waitButton = true,
+  }))
+end
+
 local function bluePrimeTalk(mod, game, ow, npc, onDone)
-  local function say(message, after)
-    game.stack:push(mod.ui.TextBox.new(game, message, after or onDone))
-  end
   if not isActive(mod) then
-    say("BLUE PRIME: You have\\nmore to prove.\\fReturn after the\\nCHAMPION challenge.")
+    bossDialogue(mod, game,
+      "BLUE PRIME: You still\nhave a journey ahead.\fReturn when you are\nthe CHAMPION.", onDone)
     return
   end
   local challenge = BY_ID.blue_prime
   if not challengeUnlocked(challenge, winsOf(mod)) then
-    say("BLUE PRIME: Defeat\\nall eight NG+ GYMS\\nbefore facing me.")
+    bossDialogue(mod, game,
+      "BLUE PRIME: Beat all\neight NG+ GYM LEADERS.\fThen we'll see how\nstrong you've become!", onDone)
     return
   end
-  say("BLUE PRIME: One\\nmore battle, rival!\\fReady to face my\\nstrongest team?", function()
-    game.stack:push(mod.ui.ChoiceBox.new(game, function(yes)
-      if onDone then onDone() end
-      if yes then startChallenge(mod, game, challenge) end
-    end, { defaultNo = true }))
-  end)
+  bossDialogue(mod, game,
+    "BLUE PRIME: Hey,\nthere you are!\fI've been waiting\nfor our rematch.\fThink you can beat\nmy strongest team?", function()
+      game.stack:push(mod.ui.ChoiceBox.new(game, function(yes)
+        if onDone then onDone() end
+        if yes then startChallenge(mod, game, challenge) end
+      end, { defaultNo = true }))
+    end)
 end
 
 -- Route 23 overworld bosses share the same progression as menu challenges.
 local ROUTE23_BOSSES = {
   { id = "dragon_master", x = 6, y = 32, sprite = "SPRITE_LANCE",
     fallback = { "SPRITE_BRUNO", "SPRITE_GENTLEMAN" },
-    intro = "DRAGON MASTER: My\\ndragons await you!\\fWill you accept\\nmy challenge?",
-    locked = "DRAGON MASTER: First\\ndefeat BLUE PRIME." },
+    intro = "DRAGON MASTER: I've\ntrained my dragons.\fThey are stronger\nthan ever before.\fWill you face me\nin battle?",
+    locked = "DRAGON MASTER: First,\ndefeat BLUE PRIME.\fThen return and\nchallenge me." },
   { id = "red_echo", x = 11, y = 20, sprite = "SPRITE_RED",
     fallback = { "SPRITE_RIVAL", "SPRITE_BLUE", "SPRITE_RED" },
-    intro = "RED ECHO: ...\\f... ...\\fReady for our\\nultimate battle?",
-    locked = "RED ECHO: ...\\fDefeat DRAGON MASTER\\nfirst." },
+    intro = "RED ECHO: ...\fYou've come far.\fShow me everything\nyou've learned.\fWill you battle?",
+    locked = "RED ECHO: ...\fDefeat DRAGON MASTER\nbefore we battle." },
 }
 
 local function route23Talk(mod, boss, game, ow, npc, onDone)
-  local function say(text, cb)
-    game.stack:push(mod.ui.TextBox.new(game, text, cb or onDone))
-  end
   if not isActive(mod) then
-    say("The challenge awaits\\na new CHAMPION.")
+    bossDialogue(mod, game,
+      "Only a CHAMPION can\naccept this challenge.", onDone)
     return
   end
   local challenge = BY_ID[boss.id]
   if not challengeUnlocked(challenge, winsOf(mod)) then
-    say(boss.locked)
+    bossDialogue(mod, game, boss.locked, onDone)
     return
   end
-  say(boss.intro, function()
+  bossDialogue(mod, game, boss.intro, function()
     game.stack:push(mod.ui.ChoiceBox.new(game, function(yes)
       if onDone then onDone() end
       if yes then startChallenge(mod, game, challenge) end
