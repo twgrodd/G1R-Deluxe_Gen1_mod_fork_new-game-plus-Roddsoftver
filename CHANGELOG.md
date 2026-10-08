@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.6
+
+- Added Blue Prime as a stationary, interactable overworld NPC at Route 22 (X=19, Y=4).
+- Added locked dialogue before the eight NG+ Gym challenges are completed.
+- Reused the existing Blue Prime boss team, victory tracking, and rewards when challenged in the overworld.
+- Preserved original Route 22 rival encounters and the NG+ menu battle.
+- Blue Prime NPC behavior requires in-game verification; Dragon Master and Red Echo NPCs are still pending coordinates.
+
 ## 1.0.5
 
 - Added a read-only SHOW COORDINATES option to the active NG+ menu.
