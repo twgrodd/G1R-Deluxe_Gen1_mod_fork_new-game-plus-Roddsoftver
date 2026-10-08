@@ -23,8 +23,12 @@ name: Release
 # MOD_ID below is stamped to this mod's id when the file is copied.
 
 on:
-  # Release only when explicitly requested. Ordinary code and docs commits
-  # must not silently create new versions.
+  # Publish only when the manifest version is explicitly changed.
+  # Source and documentation edits alone do not create releases.
+  push:
+    branches: [main]
+    paths:
+      - 'manifest.json'
   workflow_dispatch:
     inputs:
       version:
