@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.5
+
+- Added a read-only SHOW COORDINATES option to the active NG+ menu.
+- Displays the current overworld map ID, player X/Y walk-grid coordinates, and facing direction for precise future boss NPC placement.
+- Documented how to capture the Route 22 and Indigo Plateau boss locations.
+- This is a coordinate-finder test release; overworld boss NPCs have not yet been added.
+
 ## 1.0.4
 
 - Added `recordExternalVictory(game, challengeId)` compatibility API for external Gym Leader rematch victories.
