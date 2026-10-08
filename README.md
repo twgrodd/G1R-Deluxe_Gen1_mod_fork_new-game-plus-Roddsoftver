@@ -4,6 +4,12 @@ A maintained fork of [New Game Plus](https://github.com/notquiteog/new_game_plus
 
 After defeating the Champion, activate NG+ from the Start Menu. It scales ordinary trainers and wild encounters, offers eight Gym Leader challenge teams and three sequential optional bosses, and supports repeatable difficulty cycles. The dedicated NG+ menu awards its own money and items for victories.
 
+## Overworld coordinate finder (v1.0.5)
+
+The NG+ menu includes **SHOW COORDINATES** after activation. Stand on the intended NPC tile in the overworld, open the Start Menu > NG PLUS > SHOW COORDINATES, and record the map ID, X, Y and facing. These are engine walk-grid cell coordinates, not screenshot pixels. Repeat at the Route 22 Blue Prime spot, the Indigo Plateau Dragon Master spot by the entrance, and the Red Echo statue garden spot. Send the three readings back for safe NPC placement. This option only reads the player's position; it does not teleport, modify maps, or affect progression.
+
+**Overworld boss NPCs are not yet implemented in this test release.** The coordinate finder is the first stage of that feature.
+
 ## External Gym victory compatibility API
 
 Other mods can report a **confirmed victory** over one of the eight NG+ Gym Leaders without directly modifying NG+ save data:
