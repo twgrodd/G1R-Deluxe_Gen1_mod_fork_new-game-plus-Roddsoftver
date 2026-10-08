@@ -440,6 +440,20 @@ local function statusText(mod)
             trainerBoost, wildBoost)
 end
 
+-- Read-only coordinate finder for placing future overworld bosses.
+-- Uses the engine's 16px walk-grid cells (not screen pixels).
+local function coordinateText(game)
+  local ow = game and game.overworld
+  local player = ow and ow.player
+  local mapId = ow and ow.map and (ow.map.id or (ow.map.def and ow.map.def.id))
+  if not (player and mapId) then
+    return "Location unavailable.\\fReturn to the overworld\\nand try again."
+  end
+  return ("MAP: %s\\fX: %s  Y: %s\\fFACING: %s")
+    :format(tostring(mapId), tostring(player.cellX or "?"),
+            tostring(player.cellY or "?"), tostring(player.facing or "?"))
+end
+
 local function makeHub(mod, game)
   local items = {}
   if not isActive(mod) then
@@ -473,6 +487,7 @@ local function makeHub(mod, game)
 
   local wins = winsOf(mod)
   items[#items + 1] = { label = "STATUS", value = "status" }
+  items[#items + 1] = { label = "SHOW COORDINATES", value = "coordinates" }
   for _, challenge in ipairs(GYMS) do
     items[#items + 1] = {
       label = challenge.label,
@@ -503,6 +518,8 @@ local function makeHub(mod, game)
         menu:close(); mod.ui.push(game, "StartMenu")
       elseif item.value == "status" then
         game.stack:push(mod.ui.TextBox.new(game, statusText(mod)))
+      elseif item.value == "coordinates" then
+        game.stack:push(mod.ui.TextBox.new(game, coordinateText(game)))
       elseif item.value == "next_cycle" then
         menu:close(); advanceCycle(mod, game)
       else
