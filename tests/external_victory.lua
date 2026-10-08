@@ -31,7 +31,7 @@ assert(api(game, "misty").firstWin == true)
 assert(state.wins.misty == true and writes == 1)
 assert(api(game, "misty").alreadyCompleted == true and writes == 1)
 assert(game.save.money == money, "external win must not grant money")
-assert(not mod.exports.isActive() == false)
+assert(mod.exports.isActive() == true)
 local count = 0
 for _, gym in ipairs(mod.exports.gyms) do
   count = count + 1
@@ -40,6 +40,11 @@ end
 assert(count == 8)
 assert(api(game, "misty").allGymsComplete)
 assert(state.wins.blue_prime == nil)
+-- An ordinary trainer victory cannot mutate NG+ progress unless the caller
+-- explicitly invokes the API with a valid Gym ID.
+local before = writes
+assert(api(game, "ordinary_trainer").success == false)
+assert(writes == before)
 assert(writes == 8, "one write per first win")
 local savedWins = state.wins
 assert(savedWins.misty and savedWins.giovanni, "progress must persist in mod save")
