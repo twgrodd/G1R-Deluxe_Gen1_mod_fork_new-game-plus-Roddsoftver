@@ -324,6 +324,41 @@ local function recordVictory(mod, game, challenge)
   if game.writeSave then game:writeSave() end
 end
 
+-- Compatibility API for trusted rematch mods. External wins advance progress only;
+-- menu-specific money, items and victory dialogue are intentionally omitted.
+local function recordExternalVictory(mod, game, challengeId)
+  if not isActive(mod) then return { success = false, reason = "inactive" } end
+  if type(challengeId) ~= "string" then
+    return { success = false, reason = "invalid_challenge" }
+  end
+  local challenge = BY_ID[challengeId]
+  -- Only the eight Gym Leader challenges can be completed externally.
+  if not challenge or challenge.group ~= "gym" then
+    return { success = false, reason = "invalid_challenge" }
+  end
+  if not game or not game.save or type(game.writeSave) ~= "function" then
+    return { success = false, reason = "invalid_game" }
+  end
+  if runtimeGame and game ~= runtimeGame then
+    return { success = false, reason = "invalid_game" }
+  end
+
+  local wins = winsOf(mod)
+  local firstWin = not wins[challengeId]
+  if firstWin then
+    wins[challengeId] = true
+    saveWins(mod, wins)
+    game:writeSave()
+  end
+  return {
+    success = true,
+    challengeId = challengeId,
+    firstWin = firstWin,
+    alreadyCompleted = not firstWin,
+    allGymsComplete = allGymsDone(wins),
+  }
+end
+
 local function startChallenge(mod, game, challenge, menu)
   local wins = winsOf(mod)
   if not challengeUnlocked(challenge, wins) then
@@ -531,6 +566,9 @@ return function(mod)
   mod.exports.cycle = function() return cycleOf(mod) end
   mod.exports.scaledTrainerParty = function(game, party)
     return scaledTrainerParty(mod, game, party)
+  end
+  mod.exports.recordExternalVictory = function(game, challengeId)
+    return recordExternalVictory(mod, game, challengeId)
   end
   mod.exports.challengeRoster = challengeRoster
   mod.exports.gyms = GYMS
