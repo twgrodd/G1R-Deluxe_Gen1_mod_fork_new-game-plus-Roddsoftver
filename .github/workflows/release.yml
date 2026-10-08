@@ -23,11 +23,8 @@ name: Release
 # MOD_ID below is stamped to this mod's id when the file is copied.
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - '.github/**'
-      - '**.md'
+  # Release only when explicitly requested. Ordinary code and docs commits
+  # must not silently create new versions.
   workflow_dispatch:
     inputs:
       version:
