@@ -4,11 +4,17 @@ A maintained fork of [New Game Plus](https://github.com/notquiteog/new_game_plus
 
 After defeating the Champion, activate NG+ from the Start Menu. It scales ordinary trainers and wild encounters, offers eight Gym Leader challenge teams and three sequential optional bosses, and supports repeatable difficulty cycles. The dedicated NG+ menu awards its own money and items for victories.
 
+## Blue Prime overworld encounter (v1.0.6 test)
+
+**Blue Prime** is now added as a stationary NPC on **ROUTE_22, X=19, Y=4** (walk-grid coordinates). This is separate from the two original rival encounters. Talk to him after activating NG+ and completing all eight NG+ Gym challenges to start his existing Blue Prime boss battle. Before unlocking him, he gives locked dialogue. The NG+ menu battle remains available; both routes share the same boss victory state and rewards.
+
+This is an **in-game test build**: map placement, sprite choice, collision, interaction, and battle completion have not yet been verified in a running game. Please report whether the NPC appears, whether talking to him works, and whether winning marks Blue Prime DONE in the NG+ menu. Dragon Master and Red Echo overworld NPCs are **not yet implemented**.
+
 ## Overworld coordinate finder (v1.0.5)
 
 The NG+ menu includes **SHOW COORDINATES** after activation. Stand on the intended NPC tile in the overworld, open the Start Menu > NG PLUS > SHOW COORDINATES, and record the map ID, X, Y and facing. These are engine walk-grid cell coordinates, not screenshot pixels. Repeat at the Route 22 Blue Prime spot, the Indigo Plateau Dragon Master spot by the entrance, and the Red Echo statue garden spot. Send the three readings back for safe NPC placement. This option only reads the player's position; it does not teleport, modify maps, or affect progression.
 
-**Overworld boss NPCs are not yet implemented in this test release.** The coordinate finder is the first stage of that feature.
+**Blue Prime is implemented in v1.0.6 as an unverified test encounter.** The coordinate finder remains available for placing Dragon Master and Red Echo.
 
 ## External Gym victory compatibility API
 
