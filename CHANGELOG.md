@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.9
+
+- Fixed incorrectly escaped newlines and page breaks in Blue Prime, Dragon Master, and Red Echo overworld dialogue.
+- Explicitly require player input for dialogue progression and rewrote boss dialogue for clarity and grammar.
+- No changes to boss placement, battles, unlocks, or rewards.
+
 ## 1.0.8
 
 - Added Dragon Master on Route 23 at (6,32) and Red Echo on Route 23 at (11,20).
