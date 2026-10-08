@@ -1,3 +1,7 @@
+## Route 23 overworld bosses (v1.0.8 test)
+
+Dragon Master now appears on **ROUTE_23 (6,32)**, and Red Echo on **ROUTE_23 (11,20)**. Both are stationary, interactable NPCs. Dragon Master unlocks after Blue Prime; Red Echo unlocks after Dragon Master. Both use the existing NG+ menu teams, rewards, and shared victory progression, and remain available for rematches. The map assignment for Red Echo assumes the supplied coordinate is also on Route 23. Install an updated Trainer Rematch RoddSoft version with the generic NG+ boss interaction exclusion. These placements and sprite choices are not yet verified in-game.
+
 # New Game Plus Roddsoft
 
 A maintained fork of [New Game Plus](https://github.com/notquiteog/new_game_plus) for Gen1Recomp / G1R Deluxe. Credits to the original New Game Plus authors and the upstream Gen1Recomp project.
