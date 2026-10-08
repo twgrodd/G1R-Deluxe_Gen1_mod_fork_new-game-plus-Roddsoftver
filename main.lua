@@ -532,7 +532,89 @@ local function makeHub(mod, game)
   })
 end
 
+-- Route 22: a new, stationary post-game rival, independent of vanilla Blue.
+local BLUE_MAP = "ROUTE_22"
+local BLUE_TEXT = "TEXT_NG_PLUS_BLUE_PRIME"
+local BLUE_X, BLUE_Y = 19, 4
+
+local function registerBluePrime(mod)
+  local registry = mod.content.maps
+  local base = registry:get(BLUE_MAP)
+  if not base then
+    mod.log:warn("NG+ Blue Prime: ROUTE_22 map is unavailable")
+    return
+  end
+  local objects = {}
+  local maxIndex = 0
+  for i, obj in ipairs(base.objects or {}) do
+    objects[i] = obj
+    maxIndex = math.max(maxIndex, tonumber(obj.index) or i)
+    if obj.name == "NG_PLUS_BLUE_PRIME" then return end
+  end
+  -- Prefer the map's original Blue sprite if available; avoid a missing
+  -- sprite assertion when loading the map on another game version.
+  local sprite
+  for _, obj in ipairs(objects) do
+    local id = tostring(obj.text or "")
+    if id:find("RIVAL", 1, true) then
+      sprite = obj.sprite
+      break
+    end
+  end
+  if not sprite then
+    for _, candidate in ipairs({ "SPRITE_BLUE", "SPRITE_RIVAL", "SPRITE_RED" }) do
+      if mod.content.sprites:get(candidate) then sprite = candidate; break end
+    end
+  end
+  if not sprite then
+    mod.log:warn("NG+ Blue Prime: no suitable overworld sprite found")
+    return
+  end
+  if BLUE_X >= base.width * 2 or BLUE_Y >= base.height * 2 then
+    mod.log:warn("NG+ Blue Prime: coordinate outside ROUTE_22")
+    return
+  end
+  objects[#objects + 1] = {
+    index = maxIndex + 1, name = "NG_PLUS_BLUE_PRIME",
+    sprite = sprite, movement = "STAY", range = "DOWN",
+    text = BLUE_TEXT, x = BLUE_X, y = BLUE_Y,
+  }
+  local updated = copyTable(base)
+  updated.objects = objects
+  registry:override(BLUE_MAP, updated)
+end
+
+local function bluePrimeTalk(mod, game, ow, npc, onDone)
+  local function say(message, after)
+    game.stack:push(mod.ui.TextBox.new(game, message, after or onDone))
+  end
+  if not isActive(mod) then
+    say("BLUE PRIME: You have\\nmore to prove.\\fReturn after the\\nCHAMPION challenge.")
+    return
+  end
+  local challenge = BY_ID.blue_prime
+  if not challengeUnlocked(challenge, winsOf(mod)) then
+    say("BLUE PRIME: Defeat\\nall eight NG+ GYMS\\nbefore facing me.")
+    return
+  end
+  say("BLUE PRIME: One\\nmore battle, rival!\\fReady to face my\\nstrongest team?", function()
+    game.stack:push(mod.ui.ChoiceBox.new(game, function(yes)
+      if onDone then onDone() end
+      if yes then startChallenge(mod, game, challenge) end
+    end, { defaultNo = true }))
+  end)
+end
+
 return function(mod)
+  registerBluePrime(mod)
+  mod.content.map_scripts:register(BLUE_MAP, {
+    talk = {
+      [BLUE_TEXT] = function(game, ow, npc, onDone)
+        bluePrimeTalk(mod, game, ow, npc, onDone)
+      end,
+    },
+  })
+
   mod.content.screens:register(SCREEN, {
     new = function(game) return makeHub(mod, game) end,
   })
