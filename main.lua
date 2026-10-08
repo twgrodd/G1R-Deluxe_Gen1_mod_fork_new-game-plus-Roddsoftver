@@ -605,8 +605,98 @@ local function bluePrimeTalk(mod, game, ow, npc, onDone)
   end)
 end
 
+-- Route 23 overworld bosses share the same progression as menu challenges.
+local ROUTE23_BOSSES = {
+  { id = "dragon_master", x = 6, y = 32, sprite = "SPRITE_LANCE",
+    fallback = { "SPRITE_BRUNO", "SPRITE_GENTLEMAN" },
+    intro = "DRAGON MASTER: My\\ndragons await you!\\fWill you accept\\nmy challenge?",
+    locked = "DRAGON MASTER: First\\ndefeat BLUE PRIME." },
+  { id = "red_echo", x = 11, y = 20, sprite = "SPRITE_RED",
+    fallback = { "SPRITE_RIVAL", "SPRITE_BLUE", "SPRITE_RED" },
+    intro = "RED ECHO: ...\\f... ...\\fReady for our\\nultimate battle?",
+    locked = "RED ECHO: ...\\fDefeat DRAGON MASTER\\nfirst." },
+}
+
+local function route23Talk(mod, boss, game, ow, npc, onDone)
+  local function say(text, cb)
+    game.stack:push(mod.ui.TextBox.new(game, text, cb or onDone))
+  end
+  if not isActive(mod) then
+    say("The challenge awaits\\na new CHAMPION.")
+    return
+  end
+  local challenge = BY_ID[boss.id]
+  if not challengeUnlocked(challenge, winsOf(mod)) then
+    say(boss.locked)
+    return
+  end
+  say(boss.intro, function()
+    game.stack:push(mod.ui.ChoiceBox.new(game, function(yes)
+      if onDone then onDone() end
+      if yes then startChallenge(mod, game, challenge) end
+    end, { defaultNo = true }))
+  end)
+end
+
+local function registerRoute23Bosses(mod)
+  local registry = mod.content.maps
+  local base = registry:get("ROUTE_23")
+  if not base then
+    mod.log:warn("NG+ overworld bosses: ROUTE_23 unavailable")
+    return
+  end
+  local objects, maxIndex, names = {}, 0, {}
+  for i, obj in ipairs(base.objects or {}) do
+    objects[i] = obj
+    maxIndex = math.max(maxIndex, tonumber(obj.index) or i)
+    if obj.name then names[obj.name] = true end
+  end
+  local added = false
+  for _, boss in ipairs(ROUTE23_BOSSES) do
+    local name = "NG_PLUS_" .. boss.id:upper()
+    if not names[name] then
+      if boss.x < base.width * 2 and boss.y < base.height * 2 then
+        local sprite = boss.sprite
+        if not mod.content.sprites:get(sprite) then
+          sprite = nil
+          for _, fallback in ipairs(boss.fallback) do
+            if mod.content.sprites:get(fallback) then sprite = fallback; break end
+          end
+        end
+        if sprite then
+          maxIndex = maxIndex + 1
+          objects[#objects + 1] = {
+            index = maxIndex, name = name, sprite = sprite,
+            movement = "STAY", range = "DOWN",
+            text = "TEXT_" .. name, x = boss.x, y = boss.y,
+          }
+          added = true
+        else
+          mod.log:warn("NG+ boss %s: no available sprite", boss.id)
+        end
+      else
+        mod.log:warn("NG+ boss %s: position outside ROUTE_23", boss.id)
+      end
+    end
+  end
+  if added then
+    local updated = copyTable(base)
+    updated.objects = objects
+    registry:override("ROUTE_23", updated)
+  end
+end
+
 return function(mod)
   registerBluePrime(mod)
+  registerRoute23Bosses(mod)
+  local route23Talks = {}
+  for _, boss in ipairs(ROUTE23_BOSSES) do
+    local entry = boss
+    route23Talks["TEXT_NG_PLUS_" .. entry.id:upper()] = function(game, ow, npc, onDone)
+      route23Talk(mod, entry, game, ow, npc, onDone)
+    end
+  end
+  mod.content.map_scripts:register("ROUTE_23", { talk = route23Talks })
   mod.content.map_scripts:register(BLUE_MAP, {
     talk = {
       [BLUE_TEXT] = function(game, ow, npc, onDone)
