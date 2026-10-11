@@ -401,11 +401,29 @@ local function startChallenge(mod, game, challenge, menu)
   ow:pushBattle(battle)
 end
 
+-- The engine checks per-map object toggles when spawning map NPCs.
+-- Keep NG+ boss NPCs hidden until the player explicitly activates NG+.
+local function syncBossVisibility(mod, game)
+  local save = game and game.save
+  if not save then return end
+  save.objectToggles = save.objectToggles or {}
+  local visible = isActive(mod)
+  for mapId, names in pairs({
+    ROUTE_22 = { "NG_PLUS_BLUE_PRIME" },
+    ROUTE_23 = { "NG_PLUS_DRAGON_MASTER", "NG_PLUS_RED_ECHO" },
+  }) do
+    local toggles = save.objectToggles[mapId] or {}
+    save.objectToggles[mapId] = toggles
+    for _, name in ipairs(names) do toggles[name] = visible end
+  end
+end
+
 local function activate(mod, game)
   mod.save:set("active", true)
   mod.save:set("cycle", 1)
   mod.save:set("wins", {})
   mod.save:set("activated", true)
+  syncBossVisibility(mod, game)
   if game.writeSave then game:writeSave() end
 end
 
@@ -575,7 +593,7 @@ local function registerBluePrime(mod)
     return
   end
   objects[#objects + 1] = {
-    index = maxIndex + 1, name = "NG_PLUS_BLUE_PRIME",
+    index = maxIndex + 1, name = "NG_PLUS_BLUE_PRIME", hidden = true,
     sprite = sprite, movement = "STAY", range = "DOWN",
     text = BLUE_TEXT, x = BLUE_X, y = BLUE_Y,
   }
@@ -671,7 +689,7 @@ local function registerRoute23Bosses(mod)
         if sprite then
           maxIndex = maxIndex + 1
           objects[#objects + 1] = {
-            index = maxIndex, name = name, sprite = sprite,
+            index = maxIndex, name = name, sprite = sprite, hidden = true,
             movement = "STAY", range = "DOWN",
             text = "TEXT_" .. name, x = boss.x, y = boss.y,
           }
@@ -716,6 +734,7 @@ return function(mod)
 
   mod.events:on("game.ready", function(payload)
     runtimeGame = payload and payload.game or runtimeGame
+    syncBossVisibility(mod, runtimeGame)
   end)
 
   -- Every ordinary trainer becomes significantly stronger while NG PLUS is active.
