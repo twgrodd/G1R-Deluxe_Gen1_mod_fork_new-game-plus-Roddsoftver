@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.14
+
+- Hide Blue Prime, Dragon Master, and Red Echo until New Game Plus is explicitly activated.
+- Synchronize boss NPC visibility with the current save on game readiness and when activating NG+.
+- Keep boss coordinates, progression, teams, and rewards unchanged.
+
+
 ## 1.0.9
 
 - Fixed incorrectly escaped newlines and page breaks in Blue Prime, Dragon Master, and Red Echo overworld dialogue.
