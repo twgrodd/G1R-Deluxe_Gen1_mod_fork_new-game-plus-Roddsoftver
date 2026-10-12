@@ -547,7 +547,7 @@ local function makeHub(mod, game)
       end
     end,
     onCancel = function() mod.ui.push(game, "StartMenu") end,
-    footer = "A: battle  B: return",
+    -- No footer: the full-height challenge list can overlap footer text.
   })
 end
 
