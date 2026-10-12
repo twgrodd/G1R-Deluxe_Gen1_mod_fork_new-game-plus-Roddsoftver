@@ -389,8 +389,26 @@ local function startChallenge(mod, game, challenge, menu)
   end
 
   if battle.trainer then
-    battle.trainer = setmetatable({ name = challenge.displayName or challenge.label },
-                                  { __index = battle.trainer })
+    local override = { name = challenge.displayName or challenge.label }
+    if challenge.id == "red_echo" then
+      -- RIVAL3 always uses the save's rival name and Blue's front pic.
+      -- Red Echo instead uses the player's original front portrait.
+      local path, trueColor = require("src.pokemon.Sprites").playerPath(
+        game.data, "front", { kind = "battle", battle = battle })
+      if path and require("src.render.Assets").exists(path) then
+        override.pic = path
+        override.trueColor = trueColor
+      else
+        mod.log:warn("NG+ Red Echo: player front portrait unavailable")
+      end
+    end
+    battle.trainer = setmetatable(override, { __index = battle.trainer })
+    if challenge.id == "red_echo" then
+      battle.trainerPic = BattleState.trainerSprite(
+        game.data, battle.trainer, challenge.trainerClass, 1)
+    end
+    battle.introText = (challenge.displayName or challenge.label)
+      .. " wants\\nto fight!"
   end
   battle.endBattleText = (challenge.displayName or challenge.label)
     .. " acknowledges\nyour strength!"
